@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aplikasi Seleksi ASN — Prototype (HTML)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f4f6f9;
+      --primary:#0b63b7;
+      --accent:#28a745;
+      --muted:#6c757d;
+      --danger:#dc3545;
+      --glass: rgba(255,255,255,0.85);
+      --card-shadow: 0 6px 22px rgba(11,99,183,0.08);
+      --radius:12px;
+      --container-w:1024px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg,#f7f9fc 0%, var(--bg) 100%);
+      color:#162029;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-top:76px;
+      min-height:100vh;
+    }
+
+    /* Header */
+    .header{
+      position:fixed; top:0; left:0; right:0; height:76px;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 24px; background:var(--glass); backdrop-filter: blur(6px);
+      border-bottom:1px solid rgba(11,99,183,0.06); z-index:1200;
+    }
+    .brand{display:flex; align-items:center; gap:14px}
+    .brand img{height:42px}
+    .brand h1{font-family:'Montserrat'; font-size:1.05rem; margin:0; color:var(--primary)}
+    .login-group{display:flex; align-items:center; gap:12px}
+    .btn{padding:9px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:700;}
+    .btn-primary{background:var(--primary); color:white}
+    .btn-ghost{background:transparent; border:1px solid rgba(0,0,0,0.06)}
+
+    /* Layout */
+    .page{max-width:var(--container-w); margin:28px auto; padding:18px;}
+    .card{background:white; border-radius:var(--radius); box-shadow:var(--card-shadow); padding:26px;}
+
+    /* Jumbotron */
+    .hero{display:flex; gap:24px; align-items:center; justify-content:space-between; padding:34px; border-radius:16px;
+      background:linear-gradient(135deg,#0b63b7 0%, #2ea3e6 100%); color:white; margin-bottom:20px;}
+    .hero h2{margin:0; font-family:'Montserrat'; font-size:1.7rem}
+
+    /* Progress */
+    .progress-wrap{display:flex; align-items:center; gap:18px; margin:18px 0 26px}
+    .steps{display:flex; gap:12px; align-items:center; flex:1}
+    .step{ text-align:center; width:100%; position:relative; }
+    .step .circle{width:36px; height:36px; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-weight:700; color:white; background:#dbeaf9;}
+    .step.active .circle{background:var(--primary)}
+    .step.done .circle{background:var(--accent)}
+    .step .label{font-size:0.85rem; color:var(--muted)}
+    .progress-line{height:6px; background:linear-gradient(90deg,#dbeaf9,#dbeaf9); border-radius:99px; width:100%; position:relative; margin-top:6px}
+    .progress-filled{position:absolute; left:0; top:0; bottom:0; width:0%; border-radius:99px; background:linear-gradient(90deg,var(--primary),#2ea3e6); transition:width 320ms ease}
+
+    /* Screens */
+    .screens{margin-top:6px}
+    .screen{display:none}
+    .screen.active{display:block}
+    .form-row{display:flex; gap:12px; flex-wrap:wrap}
+    .field{flex:1; min-width:220px}
+    label{display:block; margin-bottom:8px; font-weight:600; color:#123}
+    input[type="text"], input[type="email"], input[type="file"], select{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6eef7; background:white;}
+    .small{font-size:0.9rem; color:var(--muted)}
+
+    /* Camera */
+    .camera-box{border:2px dashed rgba(11,99,183,0.12); padding:12px; border-radius:10px; text-align:center}
+    video{max-width:100%; border-radius:8px; background:#000}
+    .camera-controls{display:flex; gap:10px; justify-content:center; margin-top:8px}
+
+    /* Exam */
+    .exam-panel{background:#fafcff; border:1px solid #eef5ff; padding:14px; border-radius:10px}
+    .timer{font-weight:700; font-size:1.25rem; color:var(--primary)}
+    .exam-grid{display:flex; gap:18px; flex-wrap:wrap}
+    .exam-left{flex:1; min-width:320px}
+    .exam-right{flex:1; min-width:280px}
+    .sensor-box{background:#fff; padding:12px; border-radius:8px; border:1px solid #eef5ff}
+    .warnings{font-weight:700; color:var(--danger) ;}
+
+    .nav-footer{display:flex; justify-content:space-between; gap:12px; margin-top:18px}
+    .btn-wide{padding:12px 22px; border-radius:10px; font-weight:800}
+    .btn-back{background:#6c757d; color:white}
+    .btn-next{background:var(--accent); color:white}
+
+    @media (max-width:720px){
+      .hero{flex-direction:column; text-align:center}
+      .form-row{flex-direction:column}
+      .progress-wrap{flex-direction:column; align-items:flex-start}
+      .exam-grid{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <header class="header" role="banner">
+    <div class="brand" aria-hidden="false">
+      <img src="https://static.streamlit.io/logo/streamlit-mark-color.svg" alt="Logo" />
+      <div>
+        <h1>Aplikasi Seleksi ASN</h1>
+        <div style="font-size:0.85rem;color:var(--muted)">Prototype SKD & AI Proctoring</div>
+      </div>
+    </div>
+    <div class="login-group" role="navigation" aria-label="Login options">
+      <button class="btn btn-ghost" onclick="alert('Simulasi: admin login')">Admin</button>
+      <button class="btn btn-primary" onclick="goToStep(2)">Login Peserta</button>
+    </div>
+  </header>
+
+  <main class="page" role="main">
+    <section class="hero card" aria-labelledby="hero-title">
+      <div>
+        <h2 id="hero-title">Reformasi Sistem Seleksi ASN</h2>
+        <p>Prototype seleksi berbasis web dengan simulasi AI proctoring — buka di browser, aktifkan kamera untuk verifikasi.</p>
+      </div>
+      <div style="min-width:220px; text-align:right">
+        <div style="font-weight:700">Langkah</div>
+        <div style="font-size:0.95rem; color:#fff; opacity:0.95">Registrasi • Upload • Verifikasi • Ujian • Hasil</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="progress-wrap" aria-hidden="false">
+        <div class="steps" id="steps"></div>
+        <div style="flex:0 0 220px;">
+          <div class="small muted">Progres</div>
+          <div class="progress-line" aria-hidden="true">
+            <div class="progress-filled" id="progressFilled"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screens" id="screens">
+        <!-- Screen 1 -->
+        <div id="screen1" class="screen active" aria-live="polite">
+          <h3>Selamat Datang</h3>
+          <p class="small">Sebelum mulai: siapkan pas foto JPG/PNG (≤500KB), ijazah (PDF/JPG ≤2MB), dan perangkat dengan kamera jika ingin mencoba verifikasi wajah.</p>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary btn-wide" onclick="goToStep(2)">Mulai Registrasi</button>
+          </div>
+        </div>
+
+        <!-- Screen 2: Registrasi -->
+        <div id="screen2" class="screen" aria-hidden="true">
+          <h3>Langkah 1 — Registrasi Peserta</h3>
+          <p class="small muted">Isi data diri dengan teliti. NIK digunakan sebagai ID unik.</p>
+          <div style="margin-top:12px" class="form-row">
+            <div class="field">
+              <label for="nama">Nama Lengkap</label>
+              <input id="nama" type="text" placeholder="Nama sesuai KTP" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="nik">NIK (16 digit)</label>
+              <input id="nik" type="text" inputmode="numeric" maxlength="16" placeholder="1234567890123456" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="email@domain.com" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="jk">Jenis Kelamin</label>
+              <select id="jk" required>
+                <option value="">Pilih...</option>
+                <option> Laki-laki</option>
+                <option> Perempuan</option>
+                <option> Lainnya</option>
+              </select>
+            </div>
+          </div>
+          <div class="nav-footer">
+            <div><button class="btn btn-back btn-wide" onclick="goToStep(1)"> &laquo; Kembali</button></div>
+            <div><button class="btn btn-next btn-wide" onclick="validateRegistration()">Lanjut &raquo;</button></div>
+          </div>
+        </div>
+
+        <!-- Screen 3: Upload -->
+        <div id="screen3" class="screen" aria-hidden="true">
+          <h3>Langkah 2 — Upload Berkas & Validasi</h3>
+          <p class="small muted">Sistem akan memeriksa tipe dan ukuran file. (Ini simulasi; tidak dikirimkan ke server.)</p>
+          <div style="margin-top:12px;" class="form-row">
+            <div class="field">
+              <label for="foto">Pas Foto (JPG/PNG) — ≤ 500 KB</label>
+              <input id="foto" type="file" accept=".jpg,.jpeg,.png" />
+              <div id="fotoInfo" class="small muted" style="margin-top:6px;"></div>
+            </div>
+            <div class="field">
+              <label for="ijazah">Ijazah (PDF/JPG) — ≤ 2 MB</label>
+              <input id="ijazah" type="file" accept=".pdf,.jpg,.jpeg" />
+              <div id="ijazahInfo" class="small muted" style="margin-top:6px;"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;" id="validationStatus" class="small muted">Belum melakukan validasi.</div>
+          <div class="nav-footer" style="margin-top:14px">
+            <div><button class="btn btn-back btn-wide" onclick="goToStep(2)"> &laquo; Kembali</button></div>
+            <div>
+              <button class="btn btn-primary btn-wide" id="btnValidate" onclick="startValidation()">Submit & Validasi AI</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen 4: Verifikasi & Ujian -->
+        <div id="screen4" class="screen" aria-hidden="true">
+          <h3>Langkah 3 — Verifikasi Wajah & Ujian SKD</h3>
+          <p class="small muted">Aktifkan kamera untuk verifikasi. Sistem akan melakukan simulasi pencocokan wajah.</p>
+
+          <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:12px;">
+            <!-- LEFT: camera & controls -->
+            <div class="exam-left">
+              <div class="camera-box">
+                <div id="cameraContainer">
+                  <video id="cameraPreview" autoplay playsinline width="320" height="240"></video>
+                </div>
+                <div class="camera-controls">
+                  <button class="btn btn-ghost" id="btnStartCamera" onclick="startCamera(false)">Aktifkan Kamera</button>
+                  <button class="btn btn-ghost" id="btnCapture" onclick="capturePhoto()" disabled>Ambil Foto</button>
+                  <button class="btn btn-ghost" id="btnStopCamera" onclick="stopCamera()" disabled>Matikan</button>
+                </div>
+
+                <div id="captureResult" style="margin-top:10px;"></div>
+              </div>
+
+              <div style="margin-top:12px" class="exam-panel">
+                <div id="cameraStatus" class="small muted">Status Verifikasi: <strong id="statusText">Belum Diverifikasi</strong></div>
+                <div style="margin-top:12px;">
+                  <button class="btn btn-primary" id="btnVerifyFace" onclick="verifyFace()" disabled>Mulai Verifikasi Wajah</button>
+                </div>
+
+                <hr style="margin:12px 0">
+
+                <div id="examControls" style="display:none;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div><strong>Ujian SKD</strong></div>
+                    <div class="timer" id="timerDisplay">01:00</div>
+                  </div>
+                  <p class="small muted" style="margin-top:8px">Kamera akan tetap aktif untuk proctoring selama ujian.</p>
+                  <div style="margin-top:12px;">
+                    <button class="btn btn-next" id="btnStartExam" onclick="startExam()" aria-disabled="false">Mulai Ujian Sekarang</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: sensors & exam panel -->
+            <div class="exam-right">
+              <div class="sensor-box" style="margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div><strong>Sensor Kecurangan</strong></div>
+                  <div class="warnings">Peringatan: <span id="warningCount">0</span>/3</div>
+                </div>
+                <div style="margin-top:10px;">
+                  <div><small>📸 Kamera: <span id="sensorCamera">Mati</span></small></div>
+                  <div><small>🎤 Audio: <span id="sensorAudio">Mati</span></small></div>
+                  <div><small>🧭 Tab: <span id="sensorTab">Aktif</span></small></div>
+                </div>
+                <div id="warningsLog" style="margin-top:8px; font-size:0.9rem; color:#333;"></div>
+                <div style="margin-top:10px; font-size:0.85rem;" class="small muted">Catatan: sistem ini simulasi. Kamera & mikrofon memerlukan izin dari browser.</div>
+                <div style="margin-top:10px;">
+                  <button class="btn btn-ghost" id="btnEnableAudio" onclick="enableAudio()">Aktifkan Audio</button>
+                </div>
+              </div>
+
+              <!-- Exam question panel (separate) -->
+              <div class="sensor-box" id="examPanel" style="display:none;">
+                <h4 style="margin:6px 0 10px">Soal Ujian SKD</h4>
+                <form id="skdForm">
+                  <div style="margin-bottom:10px;">
+                    <div style="font-weight:700">1) (TWK) Siapa pencipta lagu "Indonesia Raya"?</div>
+                    <label><input type="radio" name="q1" value="0"> W.R. Soepratman</label><br>
+                    <label><input type="radio" name="q1" value="5"> Wage Rudolf Soepratman</label><br>
+                    <label><input type="radio" name="q1" value="0"> Ki Hajar Dewantara</label>
+                  </div>
+                  <div style="margin-bottom:10px;">
+                    <div style="font-weight:700">2) (TIU) Jika 2x + 3 = 11, maka x = ?</div>
+                    <label><input type="radio" name="q2" value="5"> 4</label><br>
+                    <label><input type="radio" name="q2" value="0"> 3</label><br>
+                    <label><input type="radio" name="q2" value="0"> 5</label>
+                  </div>
+                  <div style="margin-bottom:10px;">
+                    <div style="font-weight:700">3) (TKP) Anda menemukan rekan kerja melakukan kesalahan ringan, apa yang Anda lakukan?</div>
+                    <label><input type="radio" name="q3" value="5"> Menegur dan membantu memperbaiki kesalahan</label><br>
+                    <label><input type="radio" name="q3" value="3"> Melaporkan ke atasan</label><br>
+                    <label><input type="radio" name="q3" value="1"> Membiarkan saja</label>
+                  </div>
+                  <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button type="button" class="btn btn-ghost" onclick="submitSKD()">Selesai & Kirim Jawaban</button>
+                    <button type="button" class="btn btn-ghost" onclick="cancelExam()">Batal</button>
+                  </div>
+                </form>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="nav-footer" style="margin-top:14px">
+            <div><button class="btn btn-back btn-wide" onclick="goToStep(3)"> &laquo; Kembali</button></div>
+            <div><button class="btn btn-next btn-wide" onclick="goToStep(5)" id="btnToResult" disabled>Lanjut &raquo;</button></div>
+          </div>
+        </div>
+
+        <!-- Screen 5: Hasil -->
+        <div id="screen5" class="screen" aria-hidden="true">
+          <h3>Langkah 4 — Hasil & Konfirmasi</h3>
+          <p class="small muted">Ringkasan hasil seleksi dan integritas (simulasi).</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px">
+            <div style="background:#fff; border-radius:10px; padding:12px; border:1px solid #eef5ff;">
+              <div style="font-weight:700">Skor SKD</div>
+              <div id="score" style="font-size:1.6rem; color:var(--primary); margin-top:6px">-</div>
+            </div>
+
+            <div style="background:#fff; border-radius:10px; padding:12px; border:1px solid #eef5ff;">
+              <div style="font-weight:700">Integrity Index</div>
+              <div id="integrity" style="font-size:1.6rem; color:#f0a500; margin-top:6px">-</div>
+            </div>
+
+            <div style="grid-column:1/-1; background:#fff; border-radius:10px; padding:12px; border:1px solid #eef5ff;">
+              <div style="font-weight:700">Konfirmasi Data</div>
+              <div id="summary" style="margin-top:8px" class="small muted"></div>
+              <div id="failureReason" style="margin-top:8px; color:var(--danger); font-weight:700;"></div>
+            </div>
+          </div>
+          <div class="nav-footer" style="margin-top:16px">
+            <div><button class="btn btn-back btn-wide" onclick="goToStep(4)"> &laquo; Kembali</button></div>
+            <div><button class="btn btn-primary btn-wide" onclick="finishApplication()">Kirim Hasil & Selesai</button></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+<script>
+/* ---------------- State ---------------- */
+const stepsMeta = [
+  {id:1,label:'Awal'},
+  {id:2,label:'Registrasi'},
+  {id:3,label:'Upload'},
+  {id:4,label:'Verifikasi'},
+  {id:5,label:'Hasil'}
+];
+let currentStep = 1;
+
+const form = {
+  nama:'', nik:'', email:'', jk:'',
+  fotoFile:null, ijazahFile:null,
+  faceCaptured:null, verified:false,
+  examStarted:false, examTime:60
+};
+
+// sensors
+let sensorState = {
+  warnings: 0,
+  logs: [],
+  cameraOk: false,
+  audioOk: false,
+  tabVisible: true,
+  sensorsActive: false
+};
+
+const WARNING_LIMIT = 3;
+
+/* --------------- UI helpers --------------- */
+function renderSteps(){
+  const container = document.getElementById('steps');
+  container.innerHTML = '';
+  stepsMeta.forEach(s=>{
+    const step = document.createElement('div');
+    step.className = 'step' + (s.id===currentStep ? ' active' : '') + (s.id<currentStep ? ' done' : '');
+    step.innerHTML = `<div class="circle">${s.id-1}</div><div class="label">${s.label}</div>`;
+    container.appendChild(step);
+  });
+  const filled = document.getElementById('progressFilled');
+  const percent = Math.round(((currentStep-1)/(stepsMeta.length-1))*100);
+  filled.style.width = percent + '%';
+}
+renderSteps();
+
+function activateScreen(id){
+  document.querySelectorAll('.screen').forEach(el=> el.classList.remove('active'));
+  const el = document.getElementById('screen'+id);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=> s.setAttribute('aria-hidden','true'));
+  if(el) el.setAttribute('aria-hidden','false');
+  currentStep = id;
+  renderSteps();
+  document.getElementById('btnToResult').disabled = !(form.examStarted || form.verified);
+}
+
+function goToStep(n){
+  if (typeof n === 'number') {
+    if (n === 3 && (!form.nama || !form.nik || !form.email || !form.jk)) {
+      alert('Lengkapi data registrasi sebelum melanjutkan.');
+      goToStep(2); return;
+    }
+    if (n === 4 && (!form.fotoFile || !form.ijazahFile)) {
+      alert('Silakan upload foto dan ijazah terlebih dahulu.');
+      goToStep(3); return;
+    }
+    activateScreen(n);
+  }
+}
+
+/* --------------- Registration --------------- */
+function validateRegistration(){
+  const nama = document.getElementById('nama').value.trim();
+  const nik = document.getElementById('nik').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const jk = document.getElementById('jk').value;
+  if(!nama || !nik || !email || !jk){ alert('Mohon lengkapi semua field registrasi.'); return; }
+  if(!/^\d{16}$/.test(nik)){ alert('NIK harus 16 digit angka.'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ alert('Format email tidak valid.'); return; }
+  form.nama = nama; form.nik = nik; form.email = email; form.jk = jk;
+  goToStep(3);
+}
+
+/* --------------- Upload validation --------------- */
+const fotoInput = document.getElementById('foto');
+const ijazahInput = document.getElementById('ijazah');
+const fotoInfo = document.getElementById('fotoInfo');
+const ijazahInfo = document.getElementById('ijazahInfo');
+const validationStatus = document.getElementById('validationStatus');
+const btnValidate = document.getElementById('btnValidate');
+
+fotoInput.addEventListener('change', ()=> {
+  const f = fotoInput.files[0];
+  if(!f){ fotoInfo.textContent='Tidak ada file'; form.fotoFile=null; return; }
+  if(!['image/jpeg','image/png','image/jpg'].includes(f.type)){ fotoInfo.textContent = 'Tipe file tidak didukung. Gunakan JPG/PNG.'; form.fotoFile = null; return; }
+  if(f.size > 500*1024){ fotoInfo.textContent = 'Ukuran file lebih dari 500KB. Kompres atau ganti file.'; form.fotoFile = null; return; }
+  fotoInfo.textContent = `Nama: ${f.name} — ${(f.size/1024).toFixed(0)} KB`; form.fotoFile = f;
+});
+
+ijazahInput.addEventListener('change', ()=> {
+  const f = ijazahInput.files[0];
+  if(!f){ ijazahInfo.textContent='Tidak ada file'; form.ijazahFile=null; return; }
+  if(!['application/pdf','image/jpeg','image/jpg'].includes(f.type)){ ijazahInfo.textContent = 'Tipe file tidak didukung. Gunakan PDF/JPG.'; form.ijazahFile = null; return; }
+  if(f.size > 2*1024*1024){ ijazahInfo.textContent = 'Ukuran file lebih dari 2MB. Kompres atau ganti file.'; form.ijazahFile = null; return; }
+  ijazahInfo.textContent = `Nama: ${f.name} — ${(f.size/1024).toFixed(0)} KB`; form.ijazahFile = f;
+});
+
+function startValidation(){
+  if(!form.fotoFile || !form.ijazahFile){ alert('Upload foto & ijazah terlebih dahulu.'); return; }
+  btnValidate.disabled = true; btnValidate.textContent = 'Memproses...';
+  validationStatus.textContent = 'AI sedang memvalidasi berkas (simulasi)...';
+  setTimeout(()=>{
+    validationStatus.innerHTML = '✅ Validasi Berkas Sukses — Data siap untuk verifikasi wajah.'; btnValidate.textContent = 'Selesai'; btnValidate.disabled = false;
+    displayToast('Berkas valid — lanjut ke verifikasi wajah.'); goToStep(4);
+  }, 2200);
+}
+
+/* --------------- Camera & Audio & Sensors --------------- */
+let stream = null;
+let audioStream = null;
+let audioCtx = null;
+let audioAnalyser = null;
+let audioSource = null;
+let videoCheckInterval = null;
+let audioCheckInterval = null;
+
+const videoEl = document.getElementById('cameraPreview');
+const btnStartCamera = document.getElementById('btnStartCamera');
+const btnStopCamera = document.getElementById('btnStopCamera');
+const btnCapture = document.getElementById('btnCapture');
+const captureResult = document.getElementById('captureResult');
+const btnVerifyFace = document.getElementById('btnVerifyFace');
+const statusText = document.getElementById('statusText');
+
+async function startCamera(includeAudio = false){
+  // includeAudio true when enabling microphone (via user pressing Aktifkan Audio)
+  try{
+    const constraints = includeAudio ? { video: { facingMode: 'user' }, audio: true } : { video: { facingMode: 'user' }, audio: false };
+    const s = await navigator.mediaDevices.getUserMedia(constraints);
+
+    if(includeAudio){
+      // separate streams: videoTracks to `stream`, audioTracks to `audioStream`
+      const videoTracks = s.getVideoTracks();
+      const audioTracks = s.getAudioTracks();
+      if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+      stream = new MediaStream(videoTracks);
+      if(audioStream){ audioStream.getTracks().forEach(t=>t.stop()); }
+      audioStream = new MediaStream(audioTracks);
+    } else {
+      if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+      stream = s;
+    }
+
+    videoEl.srcObject = stream;
+    btnStopCamera.disabled = false; btnCapture.disabled = false; btnStartCamera.disabled = true;
+    document.getElementById('sensorCamera').textContent = 'Aktif';
+    sensorState.cameraOk = true;
+    displayToast('Kamera aktif. Silakan ambil foto untuk verifikasi.');
+  } catch(e){
+    alert('Gagal mengaktifkan kamera/mikrofon: ' + (e.message || e));
+  }
+}
+
+function enableAudio(){
+  // user-initiated: enable microphone and prepare audio analyser and sounds
+  startCamera(true).then(()=> {
+    // setup audio analyser
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      audioSource = audioCtx.createMediaStreamSource(audioStream);
+      audioAnalyser = audioCtx.createAnalyser();
+      audioAnalyser.fftSize = 512;
+      audioSource.connect(audioAnalyser);
+      sensorState.audioOk = true;
+      document.getElementById('sensorAudio').textContent = 'Aktif';
+      document.getElementById('btnEnableAudio').disabled = true;
+      document.getElementById('btnEnableAudio').textContent = 'Audio Aktif';
+      displayToast('Audio diaktifkan. Sensor suara siap.');
+    } catch(e){
+      console.warn('Audio setup failed', e);
+      displayToast('Gagal menyiapkan audio analyser.');
+    }
+  }).catch(()=>{ /* user denied or error handled in startCamera */});
+}
+
+function stopCamera(){
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  if(audioStream){ audioStream.getTracks().forEach(t=>t.stop()); audioStream=null; }
+  if(audioCtx){ try{ audioCtx.close(); }catch(e){} audioCtx=null; audioAnalyser=null; audioSource=null; }
+  videoEl.srcObject = null;
+  btnStopCamera.disabled = true; btnCapture.disabled = true; btnStartCamera.disabled = false;
+  document.getElementById('sensorCamera').textContent = 'Mati';
+  document.getElementById('sensorAudio').textContent = 'Mati';
+  sensorState.cameraOk=false; sensorState.audioOk=false;
+}
+
+/* capture */
+function capturePhoto(){
+  if(!stream){ alert('Kamera belum aktif.'); return; }
+  const canvas = document.createElement('canvas');
+  canvas.width = videoEl.videoWidth || 320; canvas.height = videoEl.videoHeight || 240;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(videoEl,0,0,canvas.width,canvas.height);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  captureResult.innerHTML = `<img src="${dataUrl}" alt="Foto Tangkapan" style="max-width:100%; border-radius:8px; border:1px solid #eef5ff" />`;
+  form.faceCaptured = dataUrl;
+  btnVerifyFace.disabled = false;
+  displayToast('Foto berhasil diambil. Lanjutkan verifikasi.');
+}
+
+/* verify face (simulated) */
+function verifyFace(){
+  if(!form.faceCaptured){ alert('Ambil foto terlebih dahulu.'); return; }
+  btnVerifyFace.disabled = true; statusText.innerHTML = 'Sedang membandingkan wajah...';
+  setTimeout(()=>{
+    const success = Math.random() < 0.92;
+    if(success){
+      statusText.innerHTML = '<span style="color:var(--accent)">✅ VERIFIKASI WAJAH BERHASIL</span>';
+      form.verified = true;
+      document.getElementById('examControls').style.display = 'block';
+      document.getElementById('btnToResult').disabled = false;
+      displayToast('Verifikasi wajah sukses. Anda dapat memulai ujian.');
+    } else {
+      statusText.innerHTML = `<span style="color:var(--danger)">❌ Verifikasi gagal — silakan coba lagi</span>`;
+      form.verified = false; btnVerifyFace.disabled = false;
+    }
+  }, 1200);
+}
+
+/* --------------- Sensors logic --------------- */
+function startSensors(){
+  if(sensorState.sensorsActive) return;
+  sensorState.sensorsActive = true;
+
+  // Ensure audio analyser available if audioStream exists
+  if(audioStream && !audioAnalyser){
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      audioSource = audioCtx.createMediaStreamSource(audioStream);
+      audioAnalyser = audioCtx.createAnalyser();
+      audioAnalyser.fftSize = 512;
+      audioSource.connect(audioAnalyser);
+      document.getElementById('sensorAudio').textContent = 'Aktif';
+      sensorState.audioOk = true;
+    } catch(e){ console.warn('audio analyser', e); sensorState.audioOk=false; }
+  }
+
+  // video frame check
+  videoCheckInterval = setInterval(checkVideoFrame, 2000);
+  // audio check
+  audioCheckInterval = setInterval(checkAudioLevel, 800);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  document.getElementById('sensorCamera').textContent = stream ? 'Aktif' : 'Mati';
+}
+
+function stopSensors(){
+  sensorState.sensorsActive = false;
+  if(videoCheckInterval){ clearInterval(videoCheckInterval); videoCheckInterval=null; }
+  if(audioCheckInterval){ clearInterval(audioCheckInterval); audioCheckInterval=null; }
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+}
+
+/* Warning logger */
+function logWarning(reason){
+  sensorState.warnings++;
+  sensorState.logs.push({time: new Date().toLocaleTimeString(), reason});
+  updateWarningsUI();
+  playWarning(); // audio
+  displayToast('⚠️ ' + reason);
+  if(sensorState.warnings >= WARNING_LIMIT){
+    endExamDueToCheating();
+  }
+}
+function updateWarningsUI(){
+  document.getElementById('warningCount').textContent = sensorState.warnings;
+  const wl = document.getElementById('warningsLog');
+  wl.innerHTML = sensorState.logs.slice(-5).map(l => `<div>(${l.time}) ${escapeHtml(l.reason)}</div>`).join('');
+}
+
+/* video frame brightness check (simple heuristic) */
+function checkVideoFrame(){
+  if(!stream || !videoEl.videoWidth){
+    if(form.examStarted){
+      logWarning('Kamera tidak aktif atau terputus');
+    }
+    return;
+  }
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoEl.videoWidth; canvas.height = videoEl.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(videoEl,0,0,canvas.width,canvas.height);
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let sum = 0; let count = 0;
+    for(let i=0;i<data.length;i+=40){
+      const r = data[i], g = data[i+1], b = data[i+2];
+      sum += 0.2126*r + 0.7152*g + 0.0722*b;
+      count++;
+    }
+    const avg = sum / count;
+    if(form.examStarted && (avg < 30 || avg > 250)){
+      logWarning('Wajah tidak terdeteksi / kamera tertutup');
+    }
+  } catch(e){
+    // ignore
+  }
+}
+
+/* audio level check (RMS) */
+function checkAudioLevel(){
+  if(!audioAnalyser) return;
+  const bufferLength = audioAnalyser.fftSize;
+  const dataArray = new Uint8Array(bufferLength);
+  audioAnalyser.getByteTimeDomainData(dataArray);
+  let sum = 0;
+  for(let i=0;i<dataArray.length;i++){
+    const v = (dataArray[i] - 128) / 128;
+    sum += v*v;
+  }
+  const rms = Math.sqrt(sum / dataArray.length);
+  // threshold: tuned heuristically; if loud noise and exam started -> warning
+  if(form.examStarted && rms > 0.25){
+    logWarning('Terjadi suara keras / mencurigakan');
+  }
+}
+
+/* tab visibility */
+function handleVisibilityChange(){
+  if(document.hidden){
+    document.getElementById('sensorTab').textContent = 'Tersembunyi';
+    sensorState.tabVisible = false;
+    if(form.examStarted) logWarning('Pindah tab / jendela tidak aktif');
+  } else {
+    document.getElementById('sensorTab').textContent = 'Aktif';
+    sensorState.tabVisible = true;
+  }
+}
+
+/* --------------- Audio cues (WebAudio) --------------- */
+let cueAudioCtx = null;
+function ensureCueCtx(){
+  if(cueAudioCtx) return cueAudioCtx;
+  try{
+    cueAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return cueAudioCtx;
+  } catch(e){
+    return null;
+  }
+}
+function playTone(freq, duration=0.1, type='sine', gain=0.2){
+  const ctx = ensureCueCtx();
+  if(!ctx) return;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.value = gain;
+  o.connect(g); g.connect(ctx.destination);
+  o.start();
+  setTimeout(()=>{ o.stop(); o.disconnect(); g.disconnect(); }, duration*1000);
+}
+function playStart(){
+  // pleasant start sequence
+  playTone(880,0.08); setTimeout(()=>playTone(1100,0.06),100); setTimeout(()=>playTone(1320,0.04),180);
+}
+function playWarning(){
+  playTone(360,0.25,'sawtooth',0.18);
+}
+function playAlarm(){
+  // a short descending alarm
+  playTone(1000,0.12,'sine',0.25); setTimeout(()=>playTone(700,0.12,'sine',0.25),140); setTimeout(()=>playTone(500,0.12,'sine',0.25),280);
+}
+
+/* --------------- Exam flow (timer 1 min) --------------- */
+let examTimerInterval = null;
+let remainingTime = form.examTime;
+let examFailedDueToCheating = false;
+
+function startExam(){
+  if(!form.verified){
+    alert('Verifikasi wajah harus berhasil sebelum memulai ujian.');
+    return;
+  }
+  // set exam started flag
+  form.examStarted = true;
+  remainingTime = form.examTime;
+  examFailedDueToCheating = false;
+  document.getElementById('examPanel').style.display = 'block';
+  document.getElementById('examControls').style.display = 'none';
+  document.getElementById('btnStartExam').disabled = true;
+  document.getElementById('btnToResult').disabled = false;
+
+  // reset sensor state
+  sensorState.warnings = 0; sensorState.logs = []; updateWarningsUI();
+
+  startSensors();
+  // ensure cue audio context exists (user may have enabled audio)
+  ensureCueCtx();
+  playStart();
+
+  // timer update every second
+  timerDisplay = document.getElementById('timerDisplay');
+  timerDisplay.textContent = formatTime(remainingTime);
+  examTimerInterval = setInterval(()=>{
+    remainingTime--;
+    timerDisplay.textContent = formatTime(remainingTime);
+    if(remainingTime === 10){
+      // 10 second warning
+      playAlarm();
+      displayToast('10 detik tersisa!');
+    }
+    if(remainingTime <= 0){
+      clearInterval(examTimerInterval); examTimerInterval = null;
+      finishSKDIfNotFailed();
+    }
+  }, 1000);
+
+  displayToast('Ujian dimulai — durasi 1 menit. Sensor kecurangan aktif.');
+}
+
+function formatTime(sec){
+  const m = Math.floor(sec/60);
+  const s = sec % 60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function finishSKDIfNotFailed(){
+  form.examStarted = false;
+  stopSensors();
+  if(sensorState.warnings >= WARNING_LIMIT || examFailedDueToCheating){
+    endExamDueToCheating();
+    return;
+  }
+  computeAndShowSKDResult();
+}
+
+function endExamDueToCheating(){
+  if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
+  form.examStarted = false;
+  examFailedDueToCheating = true;
+  stopSensors();
+  // set result 0
+  document.getElementById('score').textContent = 0;
+  document.getElementById('integrity').textContent = '0%';
+  const summary = `
+    <strong>Nama:</strong> ${escapeHtml(form.nama)} <br>
+    <strong>NIK:</strong> ${escapeHtml(form.nik)} <br>
+    <strong>Email:</strong> ${escapeHtml(form.email)} <br>
+    <strong>Status Verifikasi:</strong> ${form.verified ? 'Berhasil' : 'Gagal'} <br>
+  `;
+  document.getElementById('summary').innerHTML = summary;
+  document.getElementById('failureReason').textContent = 'Ujian dibatalkan: terdeteksi kecurangan (3 peringatan).';
+  playWarning();
+  goToStep(5);
+}
+
+/* submit SKD (manual) */
+function submitSKD(){
+  if(!form.examStarted){
+    // user clicked submit but exam not started
+    if(!confirm('Ujian belum dimulai. Ingin mengirim jawaban tanpa memulai ujian? (Disarankan: tekan "Mulai Ujian Sekarang")')) {
+      return;
+    }
+  }
+  if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
+  finishSKDIfNotFailed();
+}
+
+function cancelExam(){
+  if(confirm('Batalkan ujian? Semua jawaban akan hilang.')){
+    if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
+    form.examStarted = false;
+    stopSensors();
+    document.getElementById('examPanel').style.display = 'none';
+    document.getElementById('examControls').style.display = 'block';
+    document.getElementById('btnStartExam').disabled = false;
+    displayToast('Ujian dibatalkan.');
+  }
+}
+
+/* compute results */
+function computeAndShowSKDResult(){
+  const q1 = document.querySelector('input[name="q1"]:checked');
+  const q2 = document.querySelector('input[name="q2"]:checked');
+  const q3 = document.querySelector('input[name="q3"]:checked');
+  const v1 = q1 ? parseInt(q1.value) : 0;
+  const v2 = q2 ? parseInt(q2.value) : 0;
+  const v3 = q3 ? parseInt(q3.value) : 0;
+  const total = v1 + v2 + v3;
+  const integrity = Math.max(0, 100 - sensorState.warnings * 30); // simple mapping
+  document.getElementById('score').textContent = total;
+  document.getElementById('integrity').textContent = integrity + '%';
+  const summary = `
+    <strong>Nama:</strong> ${escapeHtml(form.nama)} <br>
+    <strong>NIK:</strong> ${escapeHtml(form.nik)} <br>
+    <strong>Email:</strong> ${escapeHtml(form.email)} <br>
+    <strong>Status Verifikasi:</strong> ${form.verified ? 'Berhasil' : 'Gagal'} <br>
+    <strong>Peringatan Kecurangan:</strong> ${sensorState.warnings} dari ${WARNING_LIMIT} <br>
+  `;
+  document.getElementById('summary').innerHTML = summary;
+  document.getElementById('failureReason').textContent = sensorState.warnings>0 ? 'Ada peringatan kecurangan — tinjau integritas.' : '';
+  goToStep(5);
+}
+
+/* --------------- Toast & helpers --------------- */
+function displayToast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.position='fixed';
+  t.style.right='18px';
+  t.style.bottom='18px';
+  t.style.background='rgba(10,10,10,0.9)';
+  t.style.color='white';
+  t.style.padding='10px 14px';
+  t.style.borderRadius='8px';
+  t.style.zIndex=9999;
+  t.style.boxShadow='0 8px 30px rgba(11,99,183,0.12)';
+  document.body.appendChild(t);
+  setTimeout(()=> t.style.opacity='0',2500);
+  setTimeout(()=> t.remove(),3000);
+}
+function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>"']/g, (m)=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* initialize wiring */
+document.addEventListener('DOMContentLoaded', ()=> {
+  renderSteps();
+  ['nama','nik','email','jk'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input', ()=> { form[id] = el.value; });
+  });
+
+  // enable "Selesai" button if exam started or verified status changes (periodic)
+  setInterval(()=> {
+    document.getElementById('btnToResult').disabled = !(form.examStarted || form.verified);
+  }, 500);
+});
+
+/* When user navigates to results manually */
+document.getElementById('btnToResult').addEventListener('click', ()=>{
+  if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
+  if(form.examStarted){
+    finishSKDIfNotFailed();
+  } else {
+    computeAndShowSKDResult();
+  }
+});
+
+/* safety unload */
+window.addEventListener('beforeunload', ()=>{
+  stopSensors();
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  if(audioStream) audioStream.getTracks().forEach(t=>t.stop());
+});
+
+/* finish application */
+function finishApplication(){
+  alert('Data berhasil dikirim (simulasi). Terima kasih!');
+  location.reload();
+}
+</script>
+
+</body>
+</html>
