@@ -1,7 +1,3 @@
-Tentu, ini adalah contoh file README.md yang profesional untuk proyek prototype Aplikasi Seleksi ASN yang sudah termasuk Portal Admin.
-
-Gunakan format ini untuk repositori GitHub Anda.
-
 🤖 Aplikasi Seleksi ASN Prototype (Frontend Only)
 🌟 Deskripsi Proyek
 Ini adalah prototype aplikasi seleksi Calon Aparatur Sipil Negara (ASN) yang disimulasikan menggunakan teknologi frontend murni (HTML, CSS, JavaScript) dalam satu file. Proyek ini bertujuan untuk mendemonstrasikan alur pendaftaran, verifikasi wajah dengan kamera (simulasi proctoring), ujian berbasis komputer (Computer Assisted Test - CAT), dan fitur Portal Admin untuk memantau hasil peserta secara real-time.
@@ -39,15 +35,7 @@ Simpan File: Buat file baru bernama index.html dan tempel (paste) kode di dalamn
 Buka di Browser: Buka file index.html menggunakan web browser modern (Chrome, Firefox, Edge).
 
 🔑 Akses Portal Admin
-Untuk menguji fitur admin:
-
-Jalankan aplikasi.
-
-Klik tombol Admin di pojok kanan atas header.
-
-Masukkan password simulasi: 1234.
-
-Data peserta akan muncul di tabel setelah ada peserta yang menyelesaikan ujian.
+Masi tahap pengembangan
 
 💡 Teknologi yang Digunakan
 HTML5
